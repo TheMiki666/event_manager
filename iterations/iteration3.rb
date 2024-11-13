@@ -1,4 +1,4 @@
-require 'csv'
+equire 'csv'
 require 'google/apis/civicinfo_v2'
 
 def clean_zipcode(zipcode)

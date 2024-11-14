@@ -41,6 +41,22 @@ def clean_phone_number(phone_number)
   clean_phone
 end
 
+#Asignment 2
+#Using the registration date and time we want to find out what the peak registration hours are.
+
+#We will not use the Time or Date methords, becauser we are having problems when trying to parse some of the strings
+#Instead, we will try to find the hour in the string, beause we only need the hour, not the whole time
+def extract_hour(string)
+  i = string.index(':')
+  string[i-2..i-1].delete(' ').to_i
+end
+
+#Asignment 2
+def peak_frecuency(array)
+  freq = array.reduce(Hash.new(0)) { |h,v| h[v] += 1; h }
+  array.max_by { |v| freq[v] }
+end
+
 def save_thank_you_letter(id, form_letter)
     
   Dir.mkdir ('output') unless Dir.exist?('output')
@@ -63,6 +79,9 @@ contents = CSV.open(
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
+  #Asignment 2
+  #Using the registration date and time we want to find out what the peak registration hours are.
+hours = []
 
 contents.each do |row|
   id=row[0]
@@ -71,7 +90,12 @@ contents.each do |row|
 
   zipcode = clean_zipcode(row[:zipcode])
 
+  #Asignment 1
   phone = clean_phone_number(row[:homephone])
+
+  #Asignment 2
+  #Using the registration date and time we want to find out what the peak registration hours are.
+  hours.push(extract_hour(row[:regdate]))
 
   legislators = legislators_by_zipcode(zipcode)
 
@@ -80,3 +104,5 @@ contents.each do |row|
   save_thank_you_letter(id, form_letter)
   
 end
+
+puts "The peak registrations hour is #{peak_frecuency(hours)}"

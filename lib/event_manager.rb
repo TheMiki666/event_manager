@@ -23,7 +23,7 @@ def legislators_by_zipcode(zip)
   end
 end
 
-#Asignment 1
+#Assignment 1
 #Clean phone number
 def clean_phone_number(phone_number)
   return "No valid phone" if phone_number.nil?
@@ -41,17 +41,48 @@ def clean_phone_number(phone_number)
   clean_phone
 end
 
-#Asignment 2
+#Assignment 2
 #Using the registration date and time we want to find out what the peak registration hours are.
 
-#We will not use the Time or Date methords, becauser we are having problems when trying to parse some of the strings
+#We will not use the Time or Date methords, becauser we are having problems when trying to parse directly some of the strings
 #Instead, we will try to find the hour in the string, beause we only need the hour, not the whole time
+#In Assignment 3 i demonstrate that I can manage the Date class
 def extract_hour(string)
   i = string.index(':')
   string[i-2..i-1].delete(' ').to_i
 end
 
-#Asignment 2
+#Assignment 3
+# Use Date#wday to find out the day of the week. What days of the week did most people register?
+def extract_day(string)
+  
+#The Date class needs a little help to parse the string
+  i = string.index('/')
+  month=string[0..i-1].to_i
+  cut =string[i+1..string.length-1]
+  j = cut.index('/')
+  day=cut[0..j-1].to_i
+  year=cut[j+1..j+2].to_i + 2000
+  date=Date.new(year, month, day)
+  case date.wday
+  when 0
+    'Sunday'
+  when 1
+    'Monday'
+  when 2
+    'Tuesday'
+  when 3
+    'Wednesday'
+  when 4
+    'Thursday'
+  when 5
+    'Friday'
+  when 6
+    'Saturday'
+  end
+end
+
+#Assignment 2 and 3
 def peak_frecuency(array)
   freq = array.reduce(Hash.new(0)) { |h,v| h[v] += 1; h }
   array.max_by { |v| freq[v] }
@@ -79,9 +110,10 @@ contents = CSV.open(
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
-  #Asignment 2
-  #Using the registration date and time we want to find out what the peak registration hours are.
+#Assignment 2
 hours = []
+#Assignment 3
+days=[]
 
 contents.each do |row|
   id=row[0]
@@ -90,12 +122,17 @@ contents.each do |row|
 
   zipcode = clean_zipcode(row[:zipcode])
 
-  #Asignment 1
+  #Assignment 1
   phone = clean_phone_number(row[:homephone])
 
-  #Asignment 2
+  #Assignment 2
   #Using the registration date and time we want to find out what the peak registration hours are.
   hours.push(extract_hour(row[:regdate]))
+
+  #Assignment 3
+  # Use Date#wday to find out the day of the week. What days of the week did most people register?
+  
+  days.push(extract_day(row[:regdate]))
 
   legislators = legislators_by_zipcode(zipcode)
 
@@ -106,3 +143,4 @@ contents.each do |row|
 end
 
 puts "The peak registrations hour is #{peak_frecuency(hours)}"
+puts "The peak registrations day of the week is #{peak_frecuency(days)}"
